@@ -36,7 +36,7 @@ def sample_transactions():
     ]
 
 
-def test_filter_by_currency(sample_transactions):
+def test_filter_by_currency(sample_transactions: list):
     usd_transactions = filter_by_currency(sample_transactions, "USD")
     assert next(usd_transactions)["id"] == 939719570
     assert next(usd_transactions)["id"] == 142264268
@@ -51,7 +51,7 @@ def test_filter_by_currency_parametrized(sample_transactions, currency, expected
     assert len(filtered) == expected_count
 
 
-def test_transaction_descriptions(sample_transactions):
+def test_transaction_descriptions(sample_transactions) -> None:
     descriptions = transaction_descriptions(sample_transactions)
     assert next(descriptions) == "Перевод организации"
     assert next(descriptions) == "Перевод со счета на счет"
@@ -66,6 +66,6 @@ def test_transaction_descriptions(sample_transactions):
         (5, 5, ["0000 0000 0000 0005"]),
     ],
 )
-def test_card_number_generator(start, end, expected):
+def test_card_number_generator(start: int, end: int, expected: list) -> None:
     generator = card_number_generator(start, end)
     assert list(generator) == expected
