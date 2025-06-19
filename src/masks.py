@@ -37,8 +37,8 @@ def get_mask_account(account_number: Optional[str]) -> str:
     if account_number is None:
         return ""
 
-    if not isinstance(account_number, str):
-        return "**"
+#    if not isinstance(account_number, str):
+#       return "**"
 
     cleaned = account_number.strip()
     if not cleaned:
