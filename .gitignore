@@ -2,10 +2,11 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+.idea
 # C extensions
 *.so
-
+.env
+.flake8
 # Distribution / packaging
 .Python
 build/
