@@ -1,10 +1,10 @@
 import pytest
 
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
-
+from typing import Any, Dict, List
 
 @pytest.fixture
-def sample_transactions():
+def sample_transactions() -> List[Dict[str, Any]]:
     return [
         {
             "id": 939719570,
