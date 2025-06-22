@@ -5,23 +5,20 @@ from typing import Any, Dict, Iterable, Iterator, TypeVar
 T = TypeVar("T")
 
 
-def filter_by_currency(
-        transactions: Iterable[Dict[str, Any]], currency: str) -> Iterator[Dict[str, Any]]:
+def filter_by_currency(transactions: Iterable[Dict[str, Any]], currency: str) -> Iterator[Dict[str, Any]]:
     """Фильтрация транзакций по валюте с проверкой структуры."""
     if not isinstance(currency, str) or len(currency) != 3:
         raise ValueError("Currency code must be 3 characters long")
 
     for transaction in transactions:
         try:
-            if transaction.get("operationAmount", {}).get(
-                    "currency", {}).get("code") == currency:
+            if transaction.get("operationAmount", {}).get("currency", {}).get("code") == currency:
                 yield transaction
         except AttributeError:
             continue
 
 
-def transaction_descriptions(
-        transactions: Iterable[Dict[str, Any]]) -> Iterator[str]:
+def transaction_descriptions(transactions: Iterable[Dict[str, Any]]) -> Iterator[str]:
     """Генерация описаний транзакций с проверкой структуры."""
     for transaction in transactions:
         try:

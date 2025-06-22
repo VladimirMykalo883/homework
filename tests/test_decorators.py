@@ -1,12 +1,12 @@
 import os
 import tempfile
 
-import pytest
+from _pytest.capture import CaptureFixture
 
 from decorators import log
 
 
-def test_log_success_to_console(capsys):
+def test_log_success_to_console(capsys: CaptureFixture) -> None:
     """Тест успешного логирования в консоль"""
 
     @log()
@@ -20,13 +20,13 @@ def test_log_success_to_console(capsys):
     assert "Args: (2, 3)" in captured.out
 
 
-def test_log_error_to_file():
+def test_log_error_to_file() -> None:
     """Тест логирования ошибок в файл"""
     with tempfile.NamedTemporaryFile(delete=False) as tmp:
         tmp.close()
 
         @log(filename=tmp.name)
-        def fail_func():
+        def fail_func() -> None:
             raise ValueError("Test error")
 
         try:
@@ -43,11 +43,11 @@ def test_log_error_to_file():
         os.unlink(tmp.name)
 
 
-def test_log_disabled_levels(capsys):
+def test_log_disabled_levels(capsys: CaptureFixture) -> None:
     """Тест отключения уровней логирования"""
 
     @log(log_errors=False, log_success=False)
-    def no_log_func():
+    def no_log_func() -> int:
         return 42
 
     assert no_log_func() == 42
