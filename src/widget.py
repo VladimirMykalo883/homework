@@ -33,8 +33,8 @@ def mask_account_card(payment_info: Optional[str]) -> str:
         return cleaned_info  # Возвращаем оригинальную строку, если чисел нет
 
     number = "".join(numbers)  # Объединяем найденные числа
-    # Часть строки без чисел
     bank_part = re.sub(r"\d+", "", cleaned_info).strip()
+    # Часть строки без чисел
 
     if "счет" in cleaned_info.lower():
         masked = get_mask_account(number)  # Маскируем номер счета

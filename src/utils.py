@@ -2,6 +2,9 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, Union  # Добавили недостающие импорты
 
+import logging
+
+logger = logging.getLogger('utils')
 
 class Transaction(TypedDict, total=False):
     id: int
@@ -32,9 +35,21 @@ def read_json_file(file_path: Union[str, Path]) -> List[Transaction]:
         []
     """
     try:
+        logger.info(f"Reading file: {file_path}")
         with open(file_path, "r", encoding="utf-8") as file:
             data = json.load(file)
-            return data if isinstance(data, list) else []
-    except (FileNotFoundError, json.JSONDecodeError, PermissionError) as e:
-        print(f"Error reading file {file_path}: {e}")
+            if isinstance(data, list):
+                logger.info(f"Successfully read {len(data)} items from {file_path}")
+                return data
+            else:
+                logger.warning(f"File {file_path} does not contain a list, returning empty list")
+                return []
+    except FileNotFoundError:
+        logger.error(f"File not found: {file_path}", exc_info=True)
+        return []
+    except json.JSONDecodeError:
+        logger.error(f"Invalid JSON in file: {file_path}", exc_info=True)
+        return []
+    except Exception as e:
+        logger.error(f"Unexpected error reading file {file_path}: {str(e)}", exc_info=True)
         return []
