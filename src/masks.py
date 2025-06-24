@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import logging
 import re
 from typing import Optional
-import logging
 
-logger = logging.getLogger('masks')
+logger = logging.getLogger("masks")
+
 
 def get_mask_card_number(card_number: Optional[str]) -> str:
     """
@@ -26,7 +27,7 @@ def get_mask_card_number(card_number: Optional[str]) -> str:
         digits = re.sub(r"\D", "", card_number)
         if len(digits) != 16 or not digits.isdigit():
             logger.warning(f"Invalid card number format: {card_number}")
-            return card_number
+            return "**"
 
         logger.debug(f"Успешная маскировка карты: {card_number} ")
         return f"{digits[:4]} {digits[4:6]}** **** {digits[-4:]}"

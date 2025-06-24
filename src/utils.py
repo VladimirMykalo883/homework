@@ -1,10 +1,10 @@
 import json
+import logging
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, Union  # Добавили недостающие импорты
 
-import logging
+logger = logging.getLogger("utils")
 
-logger = logging.getLogger('utils')
 
 class Transaction(TypedDict, total=False):
     id: int

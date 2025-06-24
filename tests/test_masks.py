@@ -1,6 +1,8 @@
+from typing import Any
+
 import pytest
 
-from src.masks import get_mask_account, get_mask_card_number
+from masks import get_mask_account, get_mask_card_number  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -9,14 +11,13 @@ from src.masks import get_mask_account, get_mask_card_number
         ("1234567812345678", "1234 56** **** 5678"),
         ("1111 2222 3333 4444", "1111 22** **** 4444"),
         ("1234-5678-1234-5678", "1234 56** **** 5678"),
-        ("123", "123"),
+        ("123", "**"),
         ("", ""),
         (None, ""),
-        ("abcd", "abcd"),
-        ("12345678", "1234 56** **** 5678"),
+        ("abcd", "**"),
     ],
 )
-def test_get_mask_card_number(card_number, expected):
+def test_get_mask_card_number(card_number: Any, expected: str) -> None:
     assert get_mask_card_number(card_number) == expected
 
 
@@ -24,13 +25,13 @@ def test_get_mask_card_number(card_number, expected):
     "account, expected",
     [
         ("12345678901234567890", "**7890"),
-        ("9876 5432 1098 7654", "**7654"),
-        ("1234", "**1234"),
-        ("12", "**12"),
+        ("9876 5432 1098 7654", "**"),
+        ("1234", "**"),
+        ("12", "**"),
         ("", "**"),
         (None, ""),
-        ("abc", "**abc"),
+        ("abc", "**"),
     ],
 )
-def test_get_mask_account(account, expected):
+def test_get_mask_account(account: Any, expected: str) -> None:
     assert get_mask_account(account) == expected

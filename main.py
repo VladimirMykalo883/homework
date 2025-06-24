@@ -1,33 +1,30 @@
-from pathlib import Path
 import logging
-import os
+from pathlib import Path
 
 
-def setup_logging():
+def setup_logging() -> None:
     """Настройка раздельных логгеров для каждого модуля"""
-    log_dir = Path(__file__).parent / 'logs'
+    log_dir = Path(__file__).parent / "logs"
     log_dir.mkdir(exist_ok=True)
 
     # Очищаем существующие обработчики (на случай повторного вызова)
     logging.root.handlers.clear()
 
     # Общий формат для всех логгеров
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # Настройка логгера для utils
-    utils_logger = logging.getLogger('utils')
+    utils_logger = logging.getLogger("utils")
     utils_logger.setLevel(logging.DEBUG)
-    utils_handler = logging.FileHandler(log_dir / 'utils.log', encoding='utf-8', mode='w'  # Явно указываем кодировку
-    )
+    utils_handler = logging.FileHandler(log_dir / "utils.log", encoding="utf-8", mode="w")  # Явно указываем кодировку
     utils_handler.setFormatter(formatter)
     utils_logger.addHandler(utils_handler)
     utils_logger.setLevel(logging.INFO)
 
     # Настройка логгера для masks
-    masks_logger = logging.getLogger('masks')
+    masks_logger = logging.getLogger("masks")
     masks_logger.setLevel(logging.DEBUG)
-    masks_handler = logging.FileHandler(log_dir / 'masks.log', encoding='utf-8', mode='w'  # Явно указываем кодировку
-    )
+    masks_handler = logging.FileHandler(log_dir / "masks.log", encoding="utf-8", mode="w")  # Явно указываем кодировку
     masks_handler.setFormatter(formatter)
     masks_logger.addHandler(masks_handler)
     masks_logger.setLevel(logging.INFO)
@@ -44,8 +41,8 @@ if __name__ == "__main__":
     setup_logging()
 
     # Теперь импортируем модули после настройки логирования
-    from src.utils import read_json_file
     from src.masks import get_mask_account, get_mask_card_number
+    from src.utils import read_json_file
 
     # Тестовые вызовы
     read_json_file("data/operations.json")
