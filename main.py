@@ -19,7 +19,7 @@ def setup_logging() -> None:
     utils_handler = logging.FileHandler(log_dir / "utils.log", encoding="utf-8", mode="w")  # Явно указываем кодировку
     utils_handler.setFormatter(formatter)
     utils_logger.addHandler(utils_handler)
-#    utils_logger.setLevel(logging.INFO)
+    utils_logger.setLevel(logging.INFO)
 
     # Настройка логгера для masks
     masks_logger = logging.getLogger("masks")
@@ -27,7 +27,7 @@ def setup_logging() -> None:
     masks_handler = logging.FileHandler(log_dir / "masks.log", encoding="utf-8", mode="w")  # Явно указываем кодировку
     masks_handler.setFormatter(formatter)
     masks_logger.addHandler(masks_handler)
-#    masks_logger.setLevel(logging.INFO)
+    masks_logger.setLevel(logging.INFO)
 
     # Дополнительный вывод в консоль с уровнем INFO
     console_handler = logging.StreamHandler()
