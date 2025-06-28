@@ -4,11 +4,11 @@ import re
 from datetime import datetime
 from typing import Optional
 
-from decorators import log
-from masks import get_mask_account, get_mask_card_number
+from decorators import log  # type: ignore
+from masks import get_mask_account, get_mask_card_number  # type: ignore
 
 
-@log(filename="widget_operations.log")
+@log(filename="widget_operations.log")  # type: ignore
 def mask_account_card(payment_info: Optional[str]) -> str:
     """Улучшенная маскировка платежной информации.
 

@@ -1,10 +1,10 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from src.external_api import convert_to_rub
 
 
 @patch("requests.get")
-def test_convert_to_rub_usd(mock_get):
+def test_convert_to_rub_usd(mock_get: Mock) -> None:
     mock_get.return_value.json.return_value = {"rates": {"RUB": 75.5}}
     mock_get.return_value.status_code = 200
 
