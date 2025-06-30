@@ -15,8 +15,8 @@ def filter_by_state(transactions: List[Dict[str, Any]], state: str = "EXECUTED")
     Returns:
         Отфильтрованный список транзакций
     """
-    if not isinstance(transactions, list):
-        return []
+    #   if not isinstance(transactions, list):
+    #        return []
 
     return [t for t in transactions if isinstance(t, dict) and str(t.get("state", "")).upper() == str(state).upper()]
 
@@ -32,8 +32,8 @@ def sort_by_date(transactions: List[Dict[str, Any]], reverse: bool = True) -> Li
     Returns:
         Отсортированный список транзакций
     """
-    if not isinstance(transactions, list):
-        return []
+    #    if not isinstance(transactions, list):
+    #        return []
 
 #    return [t for t in transactions if t.get("state") == state] # И здесь
 

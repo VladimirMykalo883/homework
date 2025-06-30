@@ -1,10 +1,12 @@
+from typing import Any, Dict, List
+
 import pytest
 
 from src.processing import filter_by_state, sort_by_date
-from typing import Any, Dict, List
+
 
 @pytest.fixture
-def sample_transactions()->List[Dict[str, Any]]:
+def sample_transactions():
     return [
         {"id": 1, "state": "EXECUTED", "date": "2023-01-15"},
         {"id": 2, "state": "CANCELED", "date": "2023-01-14"},
@@ -22,7 +24,9 @@ def sample_transactions()->List[Dict[str, Any]]:
         ("UNKNOWN", []),
     ],
 )
-def test_filter_by_state(sample_transactions, state, expected_ids):
+def test_filter_by_state(
+    sample_transactions: List[Dict[str, Any]], state: str, expected_ids: List[int]
+) -> None:  # Добавлены аннотации типов
     result = filter_by_state(sample_transactions, state)
     assert [t["id"] for t in result] == expected_ids
 
@@ -34,6 +38,8 @@ def test_filter_by_state(sample_transactions, state, expected_ids):
         (True, 3),
     ],
 )
-def test_sort_by_date(sample_transactions, reverse, expected_first_id):
+def test_sort_by_date(
+    sample_transactions: List[Dict[str, Any]], reverse: bool, expected_first_id: int
+) -> None:  # Добавлены аннотации типов
     result = sort_by_date(sample_transactions, reverse=reverse)
     assert result[0]["id"] == expected_first_id

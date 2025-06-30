@@ -1,10 +1,12 @@
+from typing import Any, Dict, List
+
 import pytest
 
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
-from typing import Any, Dict, List
+
 
 @pytest.fixture
-def sample_transactions() -> List[Dict[str, Any]]:
+def sample_transactions() -> List[Dict[str, Any]]:  # Добавлены аннотации типов:
     return [
         {
             "id": 939719570,
@@ -36,7 +38,7 @@ def sample_transactions() -> List[Dict[str, Any]]:
     ]
 
 
-def test_filter_by_currency(sample_transactions: list):
+def test_filter_by_currency(sample_transactions: List[Dict[str, Any]]) -> None:  # Добавлены аннотации типов
     usd_transactions = filter_by_currency(sample_transactions, "USD")
     assert next(usd_transactions)["id"] == 939719570
     assert next(usd_transactions)["id"] == 142264268
@@ -46,12 +48,14 @@ def test_filter_by_currency(sample_transactions: list):
 
 
 @pytest.mark.parametrize("currency, expected_count", [("USD", 2), ("RUB", 1), ("EUR", 0)])
-def test_filter_by_currency_parametrized(sample_transactions, currency, expected_count):
+def test_filter_by_currency_parametrized(
+    sample_transactions: List[Dict[str, Any]], currency: str, expected_count: int
+) -> None:  # Добавлены аннотации типов
     filtered = list(filter_by_currency(sample_transactions, currency))
     assert len(filtered) == expected_count
 
 
-def test_transaction_descriptions(sample_transactions) -> None:
+def test_transaction_descriptions(sample_transactions: List[Dict[str, Any]]) -> None:  # Добавлены аннотации типов
     descriptions = transaction_descriptions(sample_transactions)
     assert next(descriptions) == "Перевод организации"
     assert next(descriptions) == "Перевод со счета на счет"
@@ -66,6 +70,6 @@ def test_transaction_descriptions(sample_transactions) -> None:
         (5, 5, ["0000 0000 0000 0005"]),
     ],
 )
-def test_card_number_generator(start: int, end: int, expected: list) -> None:
+def test_card_number_generator(start: int, end: int, expected: List[str]) -> None:  # Добавлены аннотации типов
     generator = card_number_generator(start, end)
     assert list(generator) == expected

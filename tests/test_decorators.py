@@ -3,13 +3,13 @@ import tempfile
 
 from _pytest.capture import CaptureFixture
 
-from decorators import log
+from decorators import log  # type: ignore
 
 
 def test_log_success_to_console(capsys: CaptureFixture) -> None:
     """Тест успешного логирования в консоль"""
 
-    @log()
+    @log()  # type: ignore
     def add(a: int, b: int) -> int:
         return a + b
 
@@ -25,7 +25,7 @@ def test_log_error_to_file() -> None:
     with tempfile.NamedTemporaryFile(delete=False) as tmp:
         tmp.close()
 
-        @log(filename=tmp.name)
+        @log(filename=tmp.name)  # type: ignore
         def fail_func() -> None:
             raise ValueError("Test error")
 
@@ -46,7 +46,7 @@ def test_log_error_to_file() -> None:
 def test_log_disabled_levels(capsys: CaptureFixture) -> None:
     """Тест отключения уровней логирования"""
 
-    @log(log_errors=False, log_success=False)
+    @log(log_errors=False, log_success=False)  # type: ignore
     def no_log_func() -> int:
         return 42
 
