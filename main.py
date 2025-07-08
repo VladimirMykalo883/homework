@@ -1,5 +1,7 @@
 import logging
 from pathlib import Path
+from utils import read_json_file
+from file_readers import read_transactions_from_csv, read_transactions_from_excel
 
 
 def setup_logging() -> None:
@@ -29,6 +31,14 @@ def setup_logging() -> None:
     masks_logger.addHandler(masks_handler)
     masks_logger.setLevel(logging.INFO)
 
+    # Настройка логгера для file_readers
+    file_readers_logger = logging.getLogger("file_readers")
+    file_readers_logger.setLevel(logging.DEBUG)
+    file_readers_handler = logging.FileHandler(log_dir / "file_readers.log", encoding="utf-8", mode="w")
+    file_readers_handler.setFormatter(formatter)
+    file_readers_logger.addHandler(file_readers_handler)
+    file_readers_logger.setLevel(logging.INFO)
+
     # Дополнительный вывод в консоль с уровнем INFO
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
@@ -57,3 +67,12 @@ if __name__ == "__main__":
     read_json_file("data/operations.json")
     print(get_mask_card_number("Visa Platinum 7000792289606361"))
     print(get_mask_account("Счет 73654108430135874305"))
+
+    csv_transactions = read_transactions_from_csv("data/transactions.csv")
+    print(f"Прочитано {len(csv_transactions)} транзакций из CSV")
+
+    # Чтение из Excel
+    excel_transactions = read_transactions_from_excel("data/transactions_excel.xlsx")
+    print(f"Прочитано {len(excel_transactions)} транзакций из Excel")
+
+    print(excel_transactions)

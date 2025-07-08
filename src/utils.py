@@ -3,6 +3,9 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, TypedDict, Union  # Добавили недостающие импорты
 
+# Инициализация логгера для модуля utils
+logger = logging.getLogger("utils")
+
 
 class Transaction(TypedDict, total=False):
     id: int
