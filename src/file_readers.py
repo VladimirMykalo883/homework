@@ -1,74 +1,134 @@
 import csv
 import logging
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 import pandas as pd
 
-# Настройка логгера для модуля
-logger = logging.getLogger("file_readers")
+logger = logging.getLogger(__name__)
+
 
 def read_transactions_from_csv(file_path: str | Path) -> List[Dict[str, Any]]:
     """
-    Читает финансовые операции из CSV файла и возвращает список транзакций.
+    Read financial transactions from CSV file with strict type conversion.
 
     Args:
-        file_path: Путь к CSV файлу
+        file_path: Path to CSV file with transactions data
 
     Returns:
-        Список словарей с транзакциями. Если файл не найден или некорректен,
-        возвращается пустой список.
+        List of dictionaries with transaction data where:
+        - 'id' is converted to int (or None if invalid)
+        - 'amount' is converted to float (or None if invalid)
+
+    Example output:
+        [{
+            "id": 441945886,          # int
+            "state": "EXECUTED",
+            "amount": 31957.58,       # float
+            ...
+        }]
     """
-
-    logger.info(f"Начало чтения CSV файла: {file_path}")
-
     try:
+        logger.info(f"Reading CSV file: {file_path}")
+        transactions = []
+
         with open(file_path, 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            transactions = list(reader)
-            logger.info(f"Успешно прочитано {len(transactions)} транзакций из CSV файла")
-            return transactions
+            reader = csv.DictReader(file, delimiter=';')
+
+            for row in reader:
+                processed = {}
+
+                # Convert id to int
+                if 'id' in row:
+                    try:
+                        processed['id'] = int(float(row['id']))  # Handles both "123" and "123.0"
+                    except (ValueError, TypeError):
+                        processed['id'] = None
+                        logger.debug(f"Invalid id format: {row['id']}")
+
+                # Convert amount to float
+                if 'amount' in row:
+                    try:
+                        # Replace comma for European format and convert
+                        amount_str = row['amount'].replace(',', '.').strip()
+                        processed['amount'] = float(amount_str) if amount_str else None
+                    except (ValueError, TypeError):
+                        processed['amount'] = None
+                        logger.debug(f"Invalid amount format: {row['amount']}")
+
+                # Preserve other fields as-is
+                for key, value in row.items():
+                    if key not in ['id', 'amount']:
+                        processed[key] = value if value != '' else None
+
+                transactions.append(processed)
+
+        logger.info(f"Successfully read {len(transactions)} transactions")
+        return transactions
+
     except FileNotFoundError:
-        logger.error(f"CSV файл не найден: {file_path}")
+        logger.error(f"File not found: {file_path}")
         return []
-
     except csv.Error as e:
-        logger.error(f"Ошибка чтения CSV файла {file_path}: {str(e)}", exc_info=True)
+        logger.error(f"CSV parsing error: {e}")
         return []
-
     except Exception as e:
-        logger.error(f"Неожиданная ошибка при чтении CSV файла {file_path}: {str(e)}", exc_info=True)
+        logger.error(f"Unexpected error: {e}", exc_info=True)
         return []
 
 
 def read_transactions_from_excel(file_path: str | Path) -> List[Dict[str, Any]]:
     """
-    Читает финансовые операции из Excel файла и возвращает список транзакций.
+    Read financial transactions from Excel file with strict type conversion.
 
     Args:
-        file_path: Путь к Excel файлу
+        file_path: Path to Excel file (.xlsx)
 
     Returns:
-        Список словарей с транзакциями. Если файл не найден или некорректен,
-        возвращается пустой список.
+        List of dictionaries with:
+        - 'id' as int (or None)
+        - 'amount' as float (or None)
     """
-
-    logger.info(f"Начало чтения Excel файла: {file_path}")
-
     try:
-        print(file_path)
-        df = pd.read_excel(file_path)
-        transactions = df.to_dict('records')
-        logger.info(f"Успешно прочитано {len(transactions)} транзакций из Excel файла")
+        logger.info(f"Reading Excel file: {file_path}")
+
+        df = pd.read_excel(
+            file_path,
+            converters={
+                'id': lambda x: (
+                    int(float(x))
+                    if str(x).strip().replace('.', '', 1).isdigit()
+                    else None
+                ),
+                'amount': lambda x: (
+                    float(str(x).replace(',', '.'))
+                    if str(x).strip().replace(',', '.').replace('.', '', 1).isdigit()
+                    else None
+                )
+            },
+            engine='openpyxl'
+        )
+
+        # Ensure proper null handling
+        transactions = []
+        for _, row in df.iterrows():
+            processed = {
+                'id': int(row['id']) if pd.notna(row.get('id')) else None,
+                'amount': float(row['amount']) if pd.notna(row.get('amount')) else None,
+                **{k: v if pd.notna(v) else None for k, v in row.items()
+                   if k not in ['id', 'amount']}
+            }
+            transactions.append(processed)
+
+        logger.info(f"Successfully read {len(transactions)} transactions")
         return transactions
 
     except FileNotFoundError:
-        logger.error(f"Excel файл не найден: {file_path}")
+        logger.error(f"File not found: {file_path}")
         return []
-
     except pd.errors.EmptyDataError:
-        logger.error(f"Excel файл пуст: {file_path}")
+        logger.error("File is empty")
         return []
-
     except Exception as e:
-        logger.error(f"Неожиданная ошибка при чтении Excel файла {file_path}: {str(e)}", exc_info=True)
+        logger.error(f"Unexpected error: {e}", exc_info=True)
         return []

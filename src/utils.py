@@ -1,56 +1,76 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, TypedDict, Union  # Добавили недостающие импорты
+from typing import Any, Dict, List, Union  # Добавили недостающие импорты
 
-# Инициализация логгера для модуля utils
 logger = logging.getLogger("utils")
 
 
-class Transaction(TypedDict, total=False):
-    id: int
-    state: str
-    date: str
-    operationAmount: Dict[str, Any]
-    description: str
-    from_: str
-    to: str
-
-
-def read_json_file(file_path: Union[str, Path]) -> List[Transaction]:
+def read_json_file(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
     """
-    Читает JSON-файл и возвращает список транзакций.
-
-    Args:
-        file_path: Путь к JSON-файлу (строка или Path объект)
-
-    Returns:
-        Список транзакций. Если файл не найден или некорректен,
-        возвращается пустой список.
-
-    Examples:
-        >>> read_json_file("data/operations.json")
-        [{'id': 441945886, 'state': 'EXECUTED', ...}]
-
-        >>> read_json_file("invalid.json")
-        []
+    Читает JSON-файл и возвращает список транзакций в формате:
+    {
+        "id": int,
+        "state": str,
+        "date": str,
+        "amount": float,
+        "currency_name": str,
+        "currency_code": str,
+        "from": Optional[str],  # Может отсутствовать
+        "to": str,
+        "description": str
+    }
     """
     try:
-        logger.info(f"Reading file: {file_path}")
+        logger.info(f"Чтение файла: {file_path}")
         with open(file_path, "r", encoding="utf-8") as file:
             data = json.load(file)
-            if isinstance(data, list):
-                logger.info(f"Successfully read {len(data)} items from {file_path}")
-                return data
-            else:
-                logger.warning(f"File {file_path} does not contain a list, returning empty list")
+
+            if not isinstance(data, list):
+                logger.warning("Файл не содержит список транзакций!")
                 return []
-    except FileNotFoundError:
-        logger.error(f"File not found: {file_path}", exc_info=True)
-        return []
-    except json.JSONDecodeError:
-        logger.error(f"Invalid JSON in file: {file_path}", exc_info=True)
-        return []
+
+            transactions = []
+            for item in data:
+                if not isinstance(item, dict):
+                    continue  # Пропускаем некорректные записи
+
+                # Обработка operationAmount
+                operation_amount = item.get("operationAmount", {})
+                if not isinstance(operation_amount, dict):
+                    logger.warning("Пропуск транзакции: некорректный operationAmount")
+                    continue
+
+                # Конвертация amount в float
+                amount_raw = operation_amount.get("amount")
+                amount = None
+                if amount_raw is not None and str(amount_raw).strip():
+                    try:
+                        # Заменяем запятые на точки и удаляем пробелы
+                        amount_str = str(amount_raw).replace(",", "").replace(" ", "")
+                        amount = float(amount_str)
+                    except (ValueError, TypeError):
+                        logger.warning(f"Не удалось конвертировать amount: {amount_raw}")
+
+                currency = operation_amount.get("currency", {})
+
+                transaction = {
+                    "id": item.get("id"),
+                    "state": item.get("state"),
+                    "date": item.get("date"),
+                    "amount": amount,  # Теперь это float или None,
+                    "currency_name": currency.get("name"),
+                    "currency_code": currency.get("code"),
+                    "from": item.get("from"),  # Может быть None
+                    "to": item.get("to"),
+                    "description": item.get("description")
+                }
+                transactions.append(transaction)
+
+            logger.info(f"Successfully read {len(transactions)} items from {file_path}")
+            return transactions
+
     except Exception as e:
-        logger.error(f"Unexpected error reading file {file_path}: {str(e)}", exc_info=True)
+
+        logger.error(f"Ошибка: {str(e)}", exc_info=True)
         return []

@@ -54,25 +54,29 @@ if __name__ == "__main__":
     from src.utils import read_json_file
 
     # Тестовые вызовы
-    read_json_file("data/operations.json")
+#    read_json_file("data/operations.json")
     get_mask_card_number("1234567812345678")
     get_mask_account("12345678901234567890")
 
     # Тесты вызовов ошибок
     read_json_file("data/operations1.json")
-    get_mask_card_number("12345678123456789")
     get_mask_account("1234567890123456789")
 
     # Тестовые вызовы с русским текстом
-    read_json_file("data/operations.json")
+    transactions = read_json_file("data/operations.json")
     print(get_mask_card_number("Visa Platinum 7000792289606361"))
     print(get_mask_account("Счет 73654108430135874305"))
+    print("печать из json")
+    print(f"Прочитано {len(transactions)} транзакций из json")
+    print(transactions[0:5])
 
     csv_transactions = read_transactions_from_csv("data/transactions.csv")
     print(f"Прочитано {len(csv_transactions)} транзакций из CSV")
+    print("Печать из CSV")
+    print(csv_transactions[0:5])
 
     # Чтение из Excel
     excel_transactions = read_transactions_from_excel("data/transactions_excel.xlsx")
     print(f"Прочитано {len(excel_transactions)} транзакций из Excel")
-
-    print(excel_transactions)
+    print("Печать из Exel")
+    print(excel_transactions[0:5])

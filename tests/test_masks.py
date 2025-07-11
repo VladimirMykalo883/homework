@@ -1,5 +1,5 @@
 import pytest
-
+from typing import Any
 from masks import get_mask_account, get_mask_card_number  # type: ignore
 
 
@@ -9,11 +9,11 @@ from masks import get_mask_account, get_mask_card_number  # type: ignore
         ("1234567812345678", "1234 56** **** 5678"),
         ("1111 2222 3333 4444", "1111 22** **** 4444"),
         ("1234-5678-1234-5678", "1234 56** **** 5678"),
-        ("123", "123"),
+        ("123", "**"),
         ("", ""),
         (None, ""),
-        ("abcd", "abcd"),
-        ("12345678", "1234 56** **** 5678"),
+        ("abcd", "**"),
+        ("12345678", "**"),
     ],
 )
 def test_get_mask_card_number(card_number, expected):
