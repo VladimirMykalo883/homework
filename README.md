@@ -54,6 +54,10 @@ poetry install
 - read_json_file считывает список словарей из json файла и логирует
 сообщения в utils.log файл
 
+### external_apy.py конвертирует валюту в рубли с использованием данных полученных по адресу
+https://api.apilayer.com
+
+### file_readers.py считывает список словарей из .csv  и .xlsx файлов
 ---
 
 ## 🚀 Примеры использования
@@ -79,9 +83,13 @@ print(mask_account_card("Visa 7000792289606361"))  # Visa 7000 79** **** 6361
 poetry run pytest --cov=src --cov-report=html
 start htmlcov/index.html  # открыть отчет в браузере (Windows)
 
-### Структура тестов
+### Структура тестов используется параметризация, фикстуры, Mock и Patch
 
 tests/
+├── test_external_apy.py    # конвертор валюты в рубли
+├── test_file_readers.py    # чтение словарей из .scv и .xlsx файлов
+├── test_utils.py           # чтение  словарей из json файла
+├── test_decorators.py      # декораторы  логирование функций
 ├── test_generators.py      # генераторы (валюта, описания, номера)
 ├── test_masks.py           # маскировка (валидные/ошибочные случаи)
 ├── test_processing.py      # фильтрация и сортировка

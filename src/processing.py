@@ -37,7 +37,6 @@ def sort_by_date(transactions: List[Dict[str, Any]], reverse: bool = True) -> Li
 
 #    return [t for t in transactions if t.get("state") == state] # И здесь
 
-
     def get_date(item: Dict[str, Any]) -> datetime:
         """Вспомогательная функция для извлечения даты."""
         date_str = item.get("date", "")
