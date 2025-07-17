@@ -1,14 +1,14 @@
 import csv
 import logging
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Union
 
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 
 logger = logging.getLogger(__name__)
 
 
-def read_transactions_from_csv(file_path: str | Path) -> List[Dict[str, Any]]:
+def read_transactions_from_csv(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
     """
     Read financial transactions from CSV file with strict type conversion.
 
@@ -30,41 +30,38 @@ def read_transactions_from_csv(file_path: str | Path) -> List[Dict[str, Any]]:
     """
     try:
         logger.info(f"Reading CSV file: {file_path}")
-        transactions = []
+        transactions: List[Dict[str, Any]] = []
 
-        with open(file_path, 'r', encoding='utf-8') as file:
-            reader = csv.DictReader(file, delimiter=';')
+        with open(file_path, "r", encoding="utf-8") as file:
+            reader = csv.DictReader(file, delimiter=";")
 
             for row in reader:
-                processed = {}
+                processed: Dict[str, Any] = {}
 
-                # Convert id to int
-                if 'id' in row:
+                #               # Convert id to int
+                if "id" in row:
                     try:
-                        processed['id'] = int(float(row['id']))  # Handles both "123" and "123.0"
+                        processed["id"] = int(float(row["id"]))
                     except (ValueError, TypeError):
-                        processed['id'] = None
-                        logger.debug(f"Invalid id format: {row['id']}")
+                        processed["id"] = None
 
-                # Convert amount to float
-                if 'amount' in row:
+                #               #Convert amount to Optional[float]
+                if "amount" in row:
                     try:
-                        # Replace comma for European format and convert
-                        amount_str = row['amount'].replace(',', '.').strip()
-                        processed['amount'] = float(amount_str) if amount_str else None
+                        amount_str = row["amount"].replace(",", ".").strip()
+                        processed["amount"] = float(amount_str) if amount_str else None
                     except (ValueError, TypeError):
-                        processed['amount'] = None
-                        logger.debug(f"Invalid amount format: {row['amount']}")
+                        processed["amount"] = None
 
-                # Preserve other fields as-is
+                #               # Preserve other fields as-is
                 for key, value in row.items():
-                    if key not in ['id', 'amount']:
-                        processed[key] = value if value != '' else None
+                    if key not in ["id", "amount"]:
+                        processed[key] = value if value != "" else None
 
                 transactions.append(processed)
 
-        logger.info(f"Successfully read {len(transactions)} transactions")
-        return transactions
+            logger.info(f"Successfully read {len(transactions)} transactions")
+            return transactions
 
     except FileNotFoundError:
         logger.error(f"File not found: {file_path}")
@@ -77,7 +74,7 @@ def read_transactions_from_csv(file_path: str | Path) -> List[Dict[str, Any]]:
         return []
 
 
-def read_transactions_from_excel(file_path: str | Path) -> List[Dict[str, Any]]:
+def read_transactions_from_excel(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
     """
     Read financial transactions from Excel file with strict type conversion.
 
@@ -92,31 +89,32 @@ def read_transactions_from_excel(file_path: str | Path) -> List[Dict[str, Any]]:
     try:
         logger.info(f"Reading Excel file: {file_path}")
 
-        df = pd.read_excel(
-            file_path,
-            converters={
-                'id': lambda x: (
-                    int(float(x))
-                    if str(x).strip().replace('.', '', 1).isdigit()
-                    else None
-                ),
-                'amount': lambda x: (
-                    float(str(x).replace(',', '.'))
-                    if str(x).strip().replace(',', '.').replace('.', '', 1).isdigit()
-                    else None
-                )
-            },
-            engine='openpyxl'
+        # Явное преобразование Path в str
+        file_path_str = str(file_path)
+
+        #       # Явное указание типов для converters
+        converters: Dict[str, Callable[[Any], Union[int, float, None]]] = {
+            "id": lambda x: (int(float(x)) if str(x).strip().replace(".", "", 1).isdigit() else None),
+            "amount": lambda x: (
+                float(str(x).replace(",", "."))
+                if str(x).strip().replace(",", ".").replace(".", "", 1).isdigit()
+                else None
+            ),
+        }
+        df = pd.read_excel(  # type: ignore[call-overload]
+            file_path_str,
+            converters=converters,
+            engine="openpyxl",
+            dtype_backend="numpy_nullable",  # Добавьте этот параметр
         )
 
         # Ensure proper null handling
-        transactions = []
+        transactions: List[Dict[str, Any]] = []
         for _, row in df.iterrows():
             processed = {
-                'id': int(row['id']) if pd.notna(row.get('id')) else None,
-                'amount': float(row['amount']) if pd.notna(row.get('amount')) else None,
-                **{k: v if pd.notna(v) else None for k, v in row.items()
-                   if k not in ['id', 'amount']}
+                "id": int(row["id"]) if pd.notna(row.get("id")) else None,
+                "amount": float(row["amount"]) if pd.notna(row.get("amount")) else None,
+                **{k: v if pd.notna(v) else None for k, v in row.items() if k not in ["id", "amount"]},
             }
             transactions.append(processed)
 

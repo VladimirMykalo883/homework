@@ -6,7 +6,7 @@ from src.processing import filter_by_state, sort_by_date
 
 
 @pytest.fixture
-def sample_transactions():
+def sample_transactions() -> List[Dict]:
     return [
         {"id": 1, "state": "EXECUTED", "date": "2023-01-15"},
         {"id": 2, "state": "CANCELED", "date": "2023-01-14"},

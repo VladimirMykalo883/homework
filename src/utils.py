@@ -63,7 +63,7 @@ def read_json_file(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
                     "currency_code": currency.get("code"),
                     "from": item.get("from"),  # Может быть None
                     "to": item.get("to"),
-                    "description": item.get("description")
+                    "description": item.get("description"),
                 }
                 transactions.append(transaction)
 

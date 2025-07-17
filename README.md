@@ -36,10 +36,12 @@ poetry install
 
 ### 🔐 masks.py — маскировка данных
 
-- get_mask_card_number(card_number) — маскирует номер карты: 7000 79** **** 6361.
+- get_mask_card_number(card_number) — маскирует номер карты: 7000 79** **** 6361.(обновлена)
 - get_mask_account(account_number) — маскирует счёт: **4305.
 
-### 🧮 processing.py — логика обработки
+### 🧮 processing.py — логика обработки, добавлены функции
+- search_by_description - поиск словарей транзакции по строке
+- count_operations_by_category подсчет количества операций по категориям
 
 - filter_by_state(operations, state) — фильтрация по статусу (EXECUTED, PENDING и т.д.).
 - sort_by_date(operations, reverse=True) — сортировка по дате.

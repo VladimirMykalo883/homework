@@ -1,6 +1,8 @@
-import pytest
 from typing import Any
-from masks import get_mask_account, get_mask_card_number  # type: ignore
+
+import pytest
+
+from src.masks import get_mask_account, get_mask_card_number
 
 
 @pytest.mark.parametrize(
@@ -16,7 +18,7 @@ from masks import get_mask_account, get_mask_card_number  # type: ignore
         ("12345678", "**"),
     ],
 )
-def test_get_mask_card_number(card_number, expected):
+def test_get_mask_card_number(card_number, expected) -> None:
     assert get_mask_card_number(card_number) == expected
 
 
